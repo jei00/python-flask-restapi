@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/bhargavbachina/Projects/python/python-flask-restapi/myapp/bin/python3"
+    "python.pythonPath": "/Users/bhargavbachina/Projects/python/python-flask-restapi/myapp/bin/python3",
+    "liveServer.settings.port": 5501
 }
