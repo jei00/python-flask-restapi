@@ -7,21 +7,23 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'QWERTYUIOP1234567890'  
 CORS(app)
 
+#collegamento db 
 def get_db_connection():
     conn = mysql.connector.connect(host="localhost",   user="root",   password="TeleJei2123medicina",   database="db_post" )
     return conn
-    
+
+#funzione utilizzata per richiamare l'id del post da db.
 def get_post(post_id):
     conn = get_db_connection()
     cur=conn.cursor(dictionary=True)
     cur.execute('SELECT * FROM posts WHERE id = %s',(post_id,))
     post = cur.fetchone()
     conn.close()
-    if post is None:
+    if post is None:  # se il id del post non funziona ritorna False. 
         return False
     return post
     
-
+#funzione utilizzata per richiamare quando il post è stato creato da db, in ordine decrescente.
 @app.route('/posts')
 def jsonposts():
     conn = get_db_connection()
@@ -31,14 +33,14 @@ def jsonposts():
     conn.close()
     return jsonify(posts)
 
-
-@app.route('/<int:post_id>')
+#
+@app.route('/posts/<int:post_id>')
 def post(post_id):
     post = get_post(post_id)
     return jsonify(post)
 
 
-@app.route('/<int:post_id>/comments')
+@app.route('/comments/<int:post_id>')
 def comments(post_id):
     conn = get_db_connection()
     cur=conn.cursor(dictionary=True)
@@ -49,7 +51,7 @@ def comments(post_id):
     return jsonify(comments)
 
 
-@app.route('/creaPost', methods=['GET'])
+@app.route('/creapost', methods=['GET'])
 def creaPost():
     title = request.json['title'] 
     content = request.json['content']
@@ -65,35 +67,24 @@ def creaPost():
     conn.close()
     return objson
 
-
-@app.route('/<int:id>/edit', methods=['GET'])
+#funzione per edit post
+@app.route('/editpost/<int:id>', methods=['PATCH'])
 def edit(id):
     post = get_post(id)
-    if request.method == 'POST':
-        title = request.json['title']
-        content = request.json['content']
-        cat = request.json['category']
-        if not title:
-            return json.dumps({'message': 'titolo richiesto'});    
-        else:
-            conn = get_db_connection()
-            cur=conn.cursor(dictionary=True)
-            cur.execute('UPDATE posts SET title = %s, content = %s'
-                         ' WHERE id = %s',
-                         (title, content, cat, id))
-            conn.commit()
-            conn.close()
-            return json.dumps({'message': 'modifica avvenuta'});  
+    conn = get_db_connection()
+    cur=conn.cursor(dictionary=True)
+    cur.execute('UPDATE`db_post`.`posts` SET title = %s, content = %s'' WHERE id = %s')
+    conn.commit()
+    conn.close()
     return jsonify(post)
-    # return render_template('edit.html', post=post)
 
-
-@app.route('/delete', methods=['POST'])
+#funzione utillizata per cancellare un post dal db
+@app.route('/delete/<int:post_id>', methods=['POST'])
 def delete(id):
     post = get_post(id)
     conn = get_db_connection()
     cur=conn.cursor(dictionary=True)
-    cur.execute('DELETE FROM posts WHERE id = %s', (id,))
+    cur.execute('DELETE FROM posts WHERE id = %s', (id))
     conn.commit()
     conn.close()
     flash('"{}" was successfully deleted!'.format(post['title']))

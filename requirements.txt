@@ -1,5 +1,3 @@
 flask
 python-dotenv
 flask-cors
-flask-mysql
-PyMySQL

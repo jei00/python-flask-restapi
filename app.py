@@ -11,24 +11,24 @@ def home():
     return "App Works!!!"
 
 
-@app.route('/api/tasks')
+@app.route('/tasks')
 def tasks():
     return appService.get_tasks()
 
-@app.route('/api/task', methods=['POST'])
+@app.route('/create', methods=['POST'])
 def create_task():
     request_data = request.get_json()
     task = request_data['task']
     return appService.create_task(task)
 
 
-@app.route('/api/task', methods=['PUT'])
+@app.route('/update', methods=['PATCH'])
 def update_task():
     request_data = request.get_json()
     return appService.update_task(request_data['task'])
 
 
-@app.route('/api/task/<int:id>', methods=['DELETE'])
+@app.route('/delete/<int:id>', methods=['DELETE'])
 def delete_task(id):
     return appService.delete_task(id)
 
